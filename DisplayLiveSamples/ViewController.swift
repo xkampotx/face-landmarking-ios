@@ -16,28 +16,25 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        print("didload")
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
         sessionHandler.openSession()
-        
-
         let layer = sessionHandler.layer
         layer.frame = preview.bounds
-
+        sessionHandler.shapeLayer.frame = preview.bounds
+        print(preview.bounds)
         preview.layer.addSublayer(layer)
-        
+        preview.layer.addSublayer(sessionHandler.shapeLayer)
         view.layoutIfNeeded()
-
+        print(preview.bounds)
+        print("didappear")
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+//        sessionHandler.layer.frame = preview.bounds
+    }
 }
-

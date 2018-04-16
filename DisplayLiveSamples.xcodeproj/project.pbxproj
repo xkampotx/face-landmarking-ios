@@ -214,7 +214,7 @@
 				TargetAttributes = {
 					A56695EB1CE8B34B00BD7EAF = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 95V8TTVY29;
+						DevelopmentTeam = PBH378P6HJ;
 						LastSwiftMigration = 0910;
 					};
 					A56695FF1CE8B34B00BD7EAF = {
@@ -447,7 +447,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 95V8TTVY29;
+				DEVELOPMENT_TEAM = PBH378P6HJ;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DLIB_JPEG_SUPPORT,
 					DLIB_NO_GUI_SUPPORT,
@@ -468,6 +468,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -476,7 +477,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 95V8TTVY29;
+				DEVELOPMENT_TEAM = PBH378P6HJ;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DLIB_JPEG_SUPPORT,
 					DLIB_NO_GUI_SUPPORT,
@@ -496,6 +497,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "DisplayLiveSamples/DisplayLiveSamples-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

@@ -60,7 +60,7 @@
     
     // set_size expects rows, cols format
     img.set_size(height, width);
-    
+
     // copy samplebuffer image data into dlib image format
     img.reset();
     long position = 0;
@@ -94,14 +94,14 @@
         
         // detect all landmarks
         dlib::full_object_detection shape = sp(img, oneFaceRect);
-        
         // and draw them into the image (samplebuffer)
-        for (unsigned long k = 0; k < shape.num_parts(); k++) {
+        for (unsigned long k = 0; k < shape.num_parts() - 1; k++) {
             dlib::point p = shape.part(k);
+            dlib::point next = shape.part(k + 1);
             draw_solid_circle(img, p, 3, dlib::rgb_pixel(0, 255, 255));
         }
     }
-    
+
     // lets put everything back where it belongs
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
 
@@ -128,12 +128,18 @@
     std::vector<dlib::rectangle> myConvertedRects;
     for (NSValue *rectValue in rects) {
         CGRect rect = [rectValue CGRectValue];
+        CGSize size = rect.size;
+//        NSLog(NSStringFromCGRect(rect));
+//        long right = (1.0 - rect.origin.y ) * size.width;
+//        long left = right - size.height * size.width;
+//        long top = rect.origin.x * size.height;
+//        long bottom = top + size.width * size.height;
         long left = rect.origin.x;
         long top = rect.origin.y;
         long right = left + rect.size.width;
         long bottom = top + rect.size.height;
         dlib::rectangle dlibRect(left, top, right, bottom);
-
+        std::cout << left << " " << top << " " << right << " " << bottom << std::endl;
         myConvertedRects.push_back(dlibRect);
     }
     return myConvertedRects;
