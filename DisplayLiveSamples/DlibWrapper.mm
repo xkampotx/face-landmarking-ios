@@ -98,7 +98,7 @@
         for (unsigned long k = 0; k < shape.num_parts() - 1; k++) {
             dlib::point p = shape.part(k);
             dlib::point next = shape.part(k + 1);
-            draw_solid_circle(img, p, 3, dlib::rgb_pixel(0, 255, 255));
+            draw_solid_circle(img, p, 2, dlib::rgb_pixel(0, 255, 255));
         }
     }
 
@@ -139,7 +139,6 @@
         long right = left + rect.size.width;
         long bottom = top + rect.size.height;
         dlib::rectangle dlibRect(left, top, right, bottom);
-        std::cout << left << " " << top << " " << right << " " << bottom << std::endl;
         myConvertedRects.push_back(dlibRect);
     }
     return myConvertedRects;

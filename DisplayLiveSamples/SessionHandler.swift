@@ -76,35 +76,21 @@ class SessionHandler : NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, A
     // MARK: AVCaptureVideoDataOutputSampleBufferDelegate
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         shapeLayer.sublayers?.forEach { $0.removeFromSuperlayer() }
-        if !currentMetadata.isEmpty {
-            let boundsArray = currentMetadata
-                .compactMap { $0 as? AVMetadataFaceObject }
-                .map { (faceObject) -> NSValue in
-                    if faceObject.hasYawAngle {
-                        print("yaw: \(faceObject.yawAngle)")
-                    }
-                    if faceObject.hasRollAngle {
-                        print("roll: \(faceObject.rollAngle)")
-                    }
-                    let convertedObject = output.transformedMetadataObject(for: faceObject, connection: connection)
-                    return NSValue(cgRect: convertedObject!.bounds)
-            }
-            let layer = CAShapeLayer()
-            let rect = boundsArray.first!.cgRectValue
-            print(rect)
-            layer.frame = rect
-            layer.borderColor = UIColor.blue.cgColor
-            layer.borderWidth = 5
-            layer.fillColor = nil
-            layer.strokeColor = UIColor.black.cgColor
-            layer.lineWidth = 7
-            wrapper?.doWork(on: sampleBuffer, inRects: boundsArray)
-            DispatchQueue.main.async {
-                self.shapeLayer.addSublayer(layer)
-            }
+        defer { layer.enqueue(sampleBuffer) }
+        guard !currentMetadata.isEmpty else {
+            return
         }
 
-        layer.enqueue(sampleBuffer)
+        let boundsArray: [NSValue] = currentMetadata.compactMap {
+            guard
+                let faceObject = $0 as? AVMetadataFaceObject,
+                let bounds = output.transformedMetadataObject(for: faceObject, connection: connection)?.bounds
+            else {
+                return nil
+            }
+            return NSValue(cgRect: bounds)
+        }
+        wrapper?.doWork(on: sampleBuffer, inRects: boundsArray)
     }
     
     func captureOutput(_ output: AVCaptureOutput, didDrop sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
