@@ -19,6 +19,12 @@
 		A5A1B2D41CEA35B300626AC5 /* libdlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5A1B2D31CEA35B300626AC5 /* libdlib.a */; };
 		A5A1B2D61CEA41E200626AC5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5A1B2D51CEA41E200626AC5 /* Accelerate.framework */; };
 		A5A1B2D81CEA431600626AC5 /* shape_predictor_68_face_landmarks.dat in Resources */ = {isa = PBXBuildFile; fileRef = A5A1B2D71CEA431600626AC5 /* shape_predictor_68_face_landmarks.dat */; };
+		C9B9AAFD2090808400370611 /* sfm_shape_3448.bin in Resources */ = {isa = PBXBuildFile; fileRef = C9B9AAFC2090808300370611 /* sfm_shape_3448.bin */; };
+		C9B9AAFF209080E800370611 /* ibug_to_sfm.txt in Resources */ = {isa = PBXBuildFile; fileRef = C9B9AAFE209080E700370611 /* ibug_to_sfm.txt */; };
+		C9B9AB0120909ABE00370611 /* sfm_3448_edge_topology.json in Resources */ = {isa = PBXBuildFile; fileRef = C9B9AB0020909ABE00370611 /* sfm_3448_edge_topology.json */; };
+		C9B9AB0320909C2400370611 /* sfm_model_contours.json in Resources */ = {isa = PBXBuildFile; fileRef = C9B9AB0220909C2400370611 /* sfm_model_contours.json */; };
+		C9B9AB0520909D5F00370611 /* expression_blendshapes_3448.bin in Resources */ = {isa = PBXBuildFile; fileRef = C9B9AB0420909D5F00370611 /* expression_blendshapes_3448.bin */; };
+		C9B9AB082090B86300370611 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9B9AB072090B86300370611 /* opencv2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +65,12 @@
 		A5A1B2D31CEA35B300626AC5 /* libdlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdlib.a; path = DisplayLiveSamples/lib/libdlib.a; sourceTree = "<group>"; };
 		A5A1B2D51CEA41E200626AC5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		A5A1B2D71CEA431600626AC5 /* shape_predictor_68_face_landmarks.dat */ = {isa = PBXFileReference; lastKnownFileType = file; name = shape_predictor_68_face_landmarks.dat; path = DisplayLiveSamples/lib/shape_predictor_68_face_landmarks.dat; sourceTree = "<group>"; };
+		C9B9AAFC2090808300370611 /* sfm_shape_3448.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = sfm_shape_3448.bin; sourceTree = "<group>"; };
+		C9B9AAFE209080E700370611 /* ibug_to_sfm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ibug_to_sfm.txt; sourceTree = "<group>"; };
+		C9B9AB0020909ABE00370611 /* sfm_3448_edge_topology.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sfm_3448_edge_topology.json; sourceTree = "<group>"; };
+		C9B9AB0220909C2400370611 /* sfm_model_contours.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sfm_model_contours.json; sourceTree = "<group>"; };
+		C9B9AB0420909D5F00370611 /* expression_blendshapes_3448.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = expression_blendshapes_3448.bin; sourceTree = "<group>"; };
+		C9B9AB072090B86300370611 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = ../../../Documents/opencv2.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9B9AB082090B86300370611 /* opencv2.framework in Frameworks */,
 				A5A1B2D61CEA41E200626AC5 /* Accelerate.framework in Frameworks */,
 				A5A1B2D41CEA35B300626AC5 /* libdlib.a in Frameworks */,
 			);
@@ -98,6 +111,7 @@
 				A56696031CE8B34B00BD7EAF /* DisplayLiveSamplesTests */,
 				A566960E1CE8B34B00BD7EAF /* DisplayLiveSamplesUITests */,
 				A56695ED1CE8B34B00BD7EAF /* Products */,
+				C9B9AB062090B86200370611 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,6 +128,7 @@
 		A56695EE1CE8B34B00BD7EAF /* DisplayLiveSamples */ = {
 			isa = PBXGroup;
 			children = (
+				C937BAC82091E9C400BEAF21 /* eos Resources */,
 				A5A1B2D01CEA317B00626AC5 /* DlibWrapper.h */,
 				A5A1B2D11CEA317B00626AC5 /* DlibWrapper.mm */,
 				A56695EF1CE8B34B00BD7EAF /* AppDelegate.swift */,
@@ -144,6 +159,26 @@
 				A56696111CE8B34B00BD7EAF /* Info.plist */,
 			);
 			path = DisplayLiveSamplesUITests;
+			sourceTree = "<group>";
+		};
+		C937BAC82091E9C400BEAF21 /* eos Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C9B9AAFC2090808300370611 /* sfm_shape_3448.bin */,
+				C9B9AB0020909ABE00370611 /* sfm_3448_edge_topology.json */,
+				C9B9AB0220909C2400370611 /* sfm_model_contours.json */,
+				C9B9AB0420909D5F00370611 /* expression_blendshapes_3448.bin */,
+				C9B9AAFE209080E700370611 /* ibug_to_sfm.txt */,
+			);
+			path = "eos Resources";
+			sourceTree = "<group>";
+		};
+		C9B9AB062090B86200370611 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C9B9AB072090B86300370611 /* opencv2.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -255,9 +290,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A56695FA1CE8B34B00BD7EAF /* LaunchScreen.storyboard in Resources */,
+				C9B9AB0320909C2400370611 /* sfm_model_contours.json in Resources */,
 				A56695F71CE8B34B00BD7EAF /* Assets.xcassets in Resources */,
 				A56695F51CE8B34B00BD7EAF /* Main.storyboard in Resources */,
+				C9B9AB0520909D5F00370611 /* expression_blendshapes_3448.bin in Resources */,
+				C9B9AAFD2090808400370611 /* sfm_shape_3448.bin in Resources */,
 				A5A1B2D81CEA431600626AC5 /* shape_predictor_68_face_landmarks.dat in Resources */,
+				C9B9AAFF209080E800370611 /* ibug_to_sfm.txt in Resources */,
+				C9B9AB0120909ABE00370611 /* sfm_3448_edge_topology.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,7 +429,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_COMPILATION_MODE = singlefile;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -427,6 +467,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -436,7 +477,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -446,8 +487,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = PBH378P6HJ;
+				FRAMEWORK_SEARCH_PATHS = /Users/maksym.musiienko/Documents;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DLIB_JPEG_SUPPORT,
 					DLIB_NO_GUI_SUPPORT,
@@ -455,7 +499,17 @@
 					DLIB_USE_BLAS,
 					DLIB_USE_LAPACK,
 				);
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/DisplayLiveSamples/lib";
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/DisplayLiveSamples/lib",
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/toml11,
+					"/Users/maksym.musiienko/Projects/pet/eos/3rdparty/eigen3-nnls/src",
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/eigen/Eigen,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/nanoflann/include,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/glm,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/cereal/include,
+					/Users/maksym.musiienko/Projects/pet/eos/include,
+				);
 				INFOPLIST_FILE = DisplayLiveSamples/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -476,8 +530,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = PBH378P6HJ;
+				FRAMEWORK_SEARCH_PATHS = /Users/maksym.musiienko/Documents;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					DLIB_JPEG_SUPPORT,
 					DLIB_NO_GUI_SUPPORT,
@@ -485,7 +542,17 @@
 					DLIB_USE_BLAS,
 					DLIB_USE_LAPACK,
 				);
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/DisplayLiveSamples/lib";
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/DisplayLiveSamples/lib",
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/toml11,
+					"/Users/maksym.musiienko/Projects/pet/eos/3rdparty/eigen3-nnls/src",
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/eigen/Eigen,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/nanoflann/include,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/glm,
+					/Users/maksym.musiienko/Projects/pet/eos/3rdparty/cereal/include,
+					/Users/maksym.musiienko/Projects/pet/eos/include,
+				);
 				INFOPLIST_FILE = DisplayLiveSamples/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (

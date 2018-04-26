@@ -11,137 +11,146 @@
 
 #include <dlib/image_processing.h>
 #include <dlib/image_io.h>
+#include <dlib/opencv.h>
 
-@interface DlibWrapper ()
+#include <eos/core/Mesh.hpp>
+#include <eos/core/LandmarkMapper.hpp>
+#include <eos/morphablemodel/EdgeTopology.hpp>
+#include <eos/morphablemodel/MorphableModel.hpp>
+#include <eos/morphablemodel/Blendshape.hpp>
+#include <eos/fitting/fitting.hpp>
+#include <eos/cpp17/optional.hpp>
+#include <eos/render/draw_utils.hpp>
+#include <eos/render/texture_extraction.hpp>
+#include <Core>
 
-@property (assign) BOOL prepared;
+// for performance debugging
+// #define TICK NSDate *startTime = [NSDate date]
+// #define TOCK NSLog(@"Time: %f", -[startTime timeIntervalSinceNow])
 
-+ (std::vector<dlib::rectangle>)convertCGRectValueArray:(NSArray<NSValue *> *)rects;
-
-@end
 @implementation DlibWrapper {
     dlib::shape_predictor sp;
+    eos::morphablemodel::MorphableModel morphableModel;
+    eos::core::LandmarkMapper landmarkMapper;
+    eos::morphablemodel::EdgeTopology edgeTopology;
+    eos::fitting::ModelContour modelContour;
+    eos::fitting::ContourLandmarks contourLandmarks;
+    std::vector<eos::morphablemodel::Blendshape> blendshapes;
+    eos::core::LandmarkCollection<Eigen::Vector2f> landmarks;
 }
-
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _prepared = NO;
+        [self prepare];
     }
     return self;
 }
 
 - (void)prepare {
-    NSString *modelFileName = [[NSBundle mainBundle] pathForResource:@"shape_predictor_68_face_landmarks" ofType:@"dat"];
+    NSBundle* bundle = [NSBundle mainBundle];
+    NSString *modelFileName = [bundle pathForResource:@"shape_predictor_68_face_landmarks" ofType:@"dat"];
     std::string modelFileNameCString = [modelFileName UTF8String];
-    
+
     dlib::deserialize(modelFileNameCString) >> sp;
-    
-    // FIXME: test this stuff for memory leaks (cpp object destruction)
-    self.prepared = YES;
+
+    NSString* morphableModelFileName = [bundle pathForResource:@"sfm_shape_3448" ofType:@"bin"];
+    morphableModel = eos::morphablemodel::load_model([morphableModelFileName UTF8String]);
+
+    NSString* mappingsFileName = [bundle pathForResource:@"ibug_to_sfm" ofType:@"txt"];
+    landmarkMapper = eos::core::LandmarkMapper([mappingsFileName UTF8String]);
+    contourLandmarks = eos::fitting::ContourLandmarks::load([mappingsFileName UTF8String]);
+
+    NSString* topologyFileName = [bundle pathForResource:@"sfm_3448_edge_topology" ofType:@"json"];
+    edgeTopology = eos::morphablemodel::load_edge_topology([topologyFileName UTF8String]);
+
+    NSString* moduleContourFileName = [bundle pathForResource:@"sfm_model_contours" ofType:@"json"];
+    modelContour = eos::fitting::ModelContour::load([moduleContourFileName UTF8String]);
+
+    NSString* blendshapesFileName = [bundle pathForResource:@"expression_blendshapes_3448" ofType:@"bin"];
+    blendshapes = eos::morphablemodel::load_blendshapes([blendshapesFileName UTF8String]);
+    const int partsCount = 68;
+    landmarks.reserve(partsCount);
+    for (int i = 0; i < partsCount; i++) {
+        eos::core::Landmark<Eigen::Vector2f> landmark;
+        landmark.name = std::to_string(i + 1);
+        landmarks.emplace_back(landmark);
+    }
 }
 
 - (void)doWorkOnSampleBuffer:(CMSampleBufferRef)sampleBuffer inRects:(NSArray<NSValue *> *)rects {
-    
-    if (!self.prepared) {
-        [self prepare];
-    }
-    
-    dlib::array2d<dlib::bgr_pixel> img;
-    
-    // MARK: magic
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+
     CVPixelBufferLockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly);
-
-    size_t width = CVPixelBufferGetWidth(imageBuffer);
-    size_t height = CVPixelBufferGetHeight(imageBuffer);
     char *baseBuffer = (char *)CVPixelBufferGetBaseAddress(imageBuffer);
-    
-    // set_size expects rows, cols format
-    img.set_size(height, width);
 
-    // copy samplebuffer image data into dlib image format
-    img.reset();
-    long position = 0;
-    while (img.move_next()) {
-        dlib::bgr_pixel& pixel = img.element();
-
-        // assuming bgra format here
-        long bufferLocation = position * 4; //(row * width + column) * 4;
-        char b = baseBuffer[bufferLocation];
-        char g = baseBuffer[bufferLocation + 1];
-        char r = baseBuffer[bufferLocation + 2];
-        //        we do not need this
-        //        char a = baseBuffer[bufferLocation + 3];
-        
-        dlib::bgr_pixel newpixel(b, g, r);
-        pixel = newpixel;
-        
-        position++;
-    }
-    
-    // unlock buffer again until we need it again
+    int width = (int)CVPixelBufferGetWidth(imageBuffer);
+    int height = (int)CVPixelBufferGetHeight(imageBuffer);
+    cv::Mat cvImage(height, width, CV_8UC4, baseBuffer, CVPixelBufferGetBytesPerRow(imageBuffer));
     CVPixelBufferUnlockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly);
-    
-    // convert the face bounds list to dlib format
-    std::vector<dlib::rectangle> convertedRectangles = [DlibWrapper convertCGRectValueArray:rects];
-    
-    // for every detected face
-    for (unsigned long j = 0; j < convertedRectangles.size(); ++j)
-    {
-        dlib::rectangle oneFaceRect = convertedRectangles[j];
-        
-        // detect all landmarks
-        dlib::full_object_detection shape = sp(img, oneFaceRect);
-        // and draw them into the image (samplebuffer)
-        for (unsigned long k = 0; k < shape.num_parts() - 1; k++) {
+
+    cv::Mat coloredImage;
+    cv::cvtColor(cvImage, coloredImage, cv::COLOR_BGRA2BGR);
+
+    dlib::array2d<dlib::bgr_pixel> img;
+    dlib::assign_image(img, dlib::cv_image<dlib::bgr_pixel>(coloredImage));
+
+    if (rects.count > 0) {
+        dlib::full_object_detection shape = sp(img, [self dlibRectFrom: [[rects firstObject] CGRectValue]]);
+        for (unsigned long k = 0; k < shape.num_parts(); k++) {
             dlib::point p = shape.part(k);
-            dlib::point next = shape.part(k + 1);
-            draw_solid_circle(img, p, 2, dlib::rgb_pixel(0, 255, 255));
+            int x = (int)p.x() - 1;
+            int y = (int)p.y() - 1;
+            auto& landmark = landmarks.at(k);
+            landmark.coordinates[0] = x;
+            landmark.coordinates[1] = y;
+
+            cv::circle(coloredImage, cv::Point(x, y), 4, {0, 0, 0});
         }
     }
 
-    // lets put everything back where it belongs
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    eos::core::Mesh mesh;
+    eos::fitting::RenderingParameters renderingParams;
+    std::tie(mesh, renderingParams) = eos::fitting::fit_shape_and_pose(morphableModel, blendshapes, landmarks, landmarkMapper, coloredImage.cols, coloredImage.rows, edgeTopology, contourLandmarks, modelContour, 1, eos::cpp17::nullopt, 100000);
+    const auto viewport = eos::fitting::get_opencv_viewport(coloredImage.cols, coloredImage.rows);
+    // default draw method
+    eos::render::draw_wireframe(coloredImage, mesh, renderingParams.get_modelview(), renderingParams.get_projection(), viewport);
+    // alternative draw method: https://github.com/headupinclouds/hunter_eos_example/blob/master/eos-dlib-test.cpp
 
-    // copy dlib image data back into samplebuffer
-    img.reset();
-    position = 0;
-    while (img.move_next()) {
-        dlib::bgr_pixel& pixel = img.element();
-        
-        // assuming bgra format here
-        long bufferLocation = position * 4; //(row * width + column) * 4;
-        baseBuffer[bufferLocation] = pixel.blue;
-        baseBuffer[bufferLocation + 1] = pixel.green;
-        baseBuffer[bufferLocation + 2] = pixel.red;
-        //        we do not need this
-        //        char a = baseBuffer[bufferLocation + 3];
-        
-        position++;
+    const auto rotation = renderingParams.get_rotation();
+    const float pitchAngle = glm::degrees(glm::pitch(rotation));
+    const float yawAngle = glm::degrees(glm::yaw(rotation));
+    const float rollAngle = glm::degrees(glm::roll(rotation));
+
+    std::cout << "pitch: " << pitchAngle << "; yaw: " << yawAngle << "; roll: " << rollAngle << std::endl;
+
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    const auto data = coloredImage.data;
+    const int channels = coloredImage.channels();
+    const int widthAndChannels = width * channels;
+
+    long position = 0;
+    for (int i = 0; i < height; i++) {
+        const int widthIndex = i * widthAndChannels;
+        for (int j = 0; j < width; j++) {
+            const long location = position * 4;
+            const int index = widthIndex + j * channels;
+            baseBuffer[location] = data[index];
+            baseBuffer[location + 1] = data[index + 1];
+            baseBuffer[location + 2] = data[index + 2];
+            position++;
+        }
     }
+
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
 }
 
-+ (std::vector<dlib::rectangle>)convertCGRectValueArray:(NSArray<NSValue *> *)rects {
-    std::vector<dlib::rectangle> myConvertedRects;
-    for (NSValue *rectValue in rects) {
-        CGRect rect = [rectValue CGRectValue];
-        CGSize size = rect.size;
-//        NSLog(NSStringFromCGRect(rect));
-//        long right = (1.0 - rect.origin.y ) * size.width;
-//        long left = right - size.height * size.width;
-//        long top = rect.origin.x * size.height;
-//        long bottom = top + size.width * size.height;
-        long left = rect.origin.x;
-        long top = rect.origin.y;
-        long right = left + rect.size.width;
-        long bottom = top + rect.size.height;
-        dlib::rectangle dlibRect(left, top, right, bottom);
-        myConvertedRects.push_back(dlibRect);
-    }
-    return myConvertedRects;
+- (dlib::rectangle) dlibRectFrom:(CGRect)rect {
+    long left = rect.origin.x;
+    long top = rect.origin.y;
+    long right = left + rect.size.width;
+    long bottom = top + rect.size.height;
+    return dlib::rectangle(left, top, right, bottom);
 }
 
 @end
